@@ -3,16 +3,6 @@ import re
 
 df = pd.read_json('orders_simple.json')
 
-print(df.head(5))
-
-"""
-
-float :amount_Total
-Shipping_days: int
-Customer_age: int
-Rating: float
-Order_date: datetime
-"""
 
 def clean_amount(amount:str)->float:
     amount = amount.strip('$')
@@ -36,6 +26,10 @@ def clean_coupon(coupon:str) ->str:
         coupon = "no coupon"
     return coupon
 
+def convert_country(country):
+    country = str(country)
+    return country
+    
 
 df['total_amount'] = df['total_amount'].apply(clean_amount)
 df['shipping_days'] = df['shipping_days'].apply(clean_ints)
@@ -44,6 +38,11 @@ df['rating'] = df['rating'].apply(clean_rating)
 df['order_date'] = pd.to_datetime(df['order_date'])
 df['items_html'] =  df['items_html'].apply(clean_html)
 df['coupon_used'] = df['coupon_used'].apply(clean_coupon)
+df['order_month'] = df['order_date'].dt.month
+df['high_value_order'] = df['total_amount'] > df['total_amount'].mean()
+df['avg_rating_country'] = df.groupby('country')['rating'].mean()
 
-print(df['coupon_used'].head(5))
-print(df.info())
+ 
+
+
+df.to_csv('clean_orders_347662413.csv')
